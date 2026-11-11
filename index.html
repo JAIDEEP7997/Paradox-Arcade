@@ -1,752 +1,1008 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paradox Arcade</title>
-  <style>
-    :root {
-      --bg: #090a10;
-      --card-bg: #121420;
-      --accent-cyan: #00f2fe;
-      --accent-magenta: #fe019a;
-      --accent-yellow: #ffd000;
-      --text-main: #f0f4fc;
-      --text-dim: #7f8a9e;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paradox Arcade v2.0</title>
+<style>
+:root {
+  --bg: #07080d;
+  --card-bg: #111422;
+  --accent-cyan: #00f2fe;
+  --accent-magenta: #fe019a;
+  --accent-yellow: #ffd000;
+  --accent-green: #00e676;
+  --text-main: #f0f4fc;
+  --text-dim: #8491a8;
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-    body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(circle at 50% 0%, #171c36 0%, #07080d 70%);
+  color: var(--text-main);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
 
-    header {
-      width: 100%;
-      max-width: 900px;
-      padding: 24px 20px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
+header {
+  width: 100%;
+  max-width: 960px;
+  padding: 20px 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
 
-    .title-row {
-      text-align: center;
-    }
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    h1 {
-      font-size: 2.2rem;
-      letter-spacing: -1px;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+.title-group h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .subtitle {
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      margin-top: 4px;
-    }
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
 
-    /* Tab Switcher */
-    .nav-tabs {
-      display: flex;
-      gap: 10px;
-      background: #171a2b;
-      padding: 6px;
-      border-radius: 99px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      max-width: 100%;
-      overflow-x: auto;
-    }
+.sound-btn {
+  background: #1a1f35;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: 0.2s;
+}
 
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      padding: 10px 20px;
-      border-radius: 99px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
+.sound-btn:hover {
+  border-color: var(--accent-cyan);
+}
 
-    .tab-btn.active {
-      background: #232840;
-      color: var(--text-main);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    }
+.nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  background: #141829;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  width: 100%;
+}
 
-    .tab-btn:hover:not(.active) {
-      color: #fff;
-    }
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 9px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.83rem;
+  transition: all 0.2s ease;
+}
 
-    /* Stage */
-    main {
-      width: 100%;
-      max-width: 900px;
-      padding: 16px 20px 30px;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
+.tab-btn.active {
+  background: linear-gradient(135deg, #252b4a, #1b2038);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+}
 
-    .game-panel {
-      display: none;
-      width: 100%;
-      background: var(--card-bg);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-      overflow: hidden;
-      flex-direction: column;
-      position: relative;
-    }
+.tab-btn:hover:not(.active) {
+  color: #fff;
+  background: rgba(255,255,255,0.03);
+}
 
-    .game-panel.active {
-      display: flex;
-    }
+main {
+  width: 100%;
+  max-width: 960px;
+  padding: 12px 20px 30px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
 
-    .panel-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0,0,0,0.15);
-    }
+.game-panel {
+  display: none;
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  flex-direction: column;
+}
 
-    .panel-header h2 {
-      font-size: 1.15rem;
-      font-weight: 800;
-    }
+.game-panel.active {
+  display: flex;
+}
 
-    .panel-header span {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-    }
+.panel-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+}
 
-    /* Game 1: Space Debris Sorter */
-    #sorter-canvas-container {
-      position: relative;
-      height: 480px;
-      width: 100%;
-      background: radial-gradient(circle at center, #151829 0%, #0d0f1a 100%);
-      overflow: hidden;
-      cursor: grab;
-    }
+.panel-header h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
 
-    #sorter-canvas-container:active {
-      cursor: grabbing;
-    }
+.panel-header span {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
 
-    .vortex {
-      position: absolute;
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.8rem;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      animation: rotateVortex 6s linear infinite;
-    }
+.action-chip {
+  background: #232946;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
 
-    .vortex-cyan {
-      top: 25%;
-      right: 15%;
-      border: 3px dashed var(--accent-cyan);
-      box-shadow: 0 0 30px rgba(0, 242, 254, 0.25);
-      color: var(--accent-cyan);
-    }
+.action-chip:hover {
+  border-color: var(--accent-cyan);
+}
 
-    .vortex-magenta {
-      bottom: 25%;
-      left: 15%;
-      border: 3px dashed var(--accent-magenta);
-      box-shadow: 0 0 30px rgba(254, 1, 154, 0.25);
-      color: var(--accent-magenta);
-    }
+/* GAME 1: SPACE SORTER */
+#sorter-stage {
+  position: relative;
+  height: 460px;
+  width: 100%;
+  background: radial-gradient(circle at center, #161a30 0%, #0b0d17 100%);
+  overflow: hidden;
+}
 
-    @keyframes rotateVortex {
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
+.vortex {
+  position: absolute;
+  width: 115px;
+  height: 115px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: spinVortex 8s linear infinite;
+}
 
-    .debris-chip {
-      position: absolute;
-      padding: 10px 16px;
-      border-radius: 50px;
-      background: #252b45;
-      font-weight: 700;
-      font-size: 0.85rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-      touch-action: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 2px solid transparent;
-      transform: translate(-50%, -50%);
-      transition: border-color 0.15s ease;
-    }
+.vortex-cyan {
+  top: 25%;
+  right: 15%;
+  border: 3px dashed var(--accent-cyan);
+  box-shadow: 0 0 35px rgba(0, 242, 254, 0.25), inset 0 0 20px rgba(0, 242, 254, 0.15);
+  color: var(--accent-cyan);
+}
 
-    .debris-chip.tech { border-color: rgba(0, 242, 254, 0.4); }
-    .debris-chip.chaos { border-color: rgba(254, 1, 154, 0.4); }
+.vortex-magenta {
+  bottom: 25%;
+  left: 15%;
+  border: 3px dashed var(--accent-magenta);
+  box-shadow: 0 0 35px rgba(254, 1, 154, 0.25), inset 0 0 20px rgba(254, 1, 154, 0.15);
+  color: var(--accent-magenta);
+}
 
-    .score-badge {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--accent-yellow);
-    }
+@keyframes spinVortex {
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
 
-    /* Game 2: The Infinite Excuse Generator */
-    .excuse-box {
-      padding: 30px 24px;
-      min-height: 480px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      background: #0f111a;
-    }
+.debris-item {
+  position: absolute;
+  padding: 9px 15px;
+  border-radius: 40px;
+  background: #1f2540;
+  font-weight: 700;
+  font-size: 0.82rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  cursor: grab;
+  touch-action: none;
+  white-space: nowrap;
+  border: 2px solid transparent;
+  transform: translate(-50%, -50%);
+}
 
-    .excuse-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
+.debris-item:active { cursor: grabbing; }
+.debris-item.tech { border-color: var(--accent-cyan); }
+.debris-item.chaos { border-color: var(--accent-magenta); }
 
-    .excuse-btn {
-      background: linear-gradient(135deg, #2b3254, #1b2038);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.9rem;
-      transition: all 0.15s ease;
-    }
+.stats-row {
+  display: flex;
+  gap: 15px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
 
-    .excuse-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
-      border-color: var(--accent-cyan);
-    }
+/* GAME 2: EXCUSE ENGINE */
+.excuse-stage {
+  padding: 24px;
+  min-height: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: #0d101b;
+}
 
-    .chain-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 10px;
-    }
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-    .chain-node {
-      background: #171b2c;
-      border-left: 4px solid var(--accent-cyan);
-      padding: 16px 18px;
-      border-radius: 8px;
-      animation: fadeInNode 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
+.excuse-btn {
+  background: #1b2138;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  padding: 11px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: 0.15s;
+}
 
-    .chain-node.escalated {
-      border-left-color: var(--accent-magenta);
-    }
+.excuse-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+  background: #232b4a;
+}
 
-    .chain-node.absurd {
-      border-left-color: var(--accent-yellow);
-    }
+.chain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 330px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
 
-    .chain-step {
-      font-size: 0.7rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-      margin-bottom: 4px;
-    }
+.chain-card {
+  background: #161b2e;
+  border-left: 4px solid var(--accent-cyan);
+  padding: 14px 16px;
+  border-radius: 8px;
+  animation: popIn 0.25s ease;
+}
 
-    .chain-text {
-      font-size: 1rem;
-      line-height: 1.4;
-      font-weight: 600;
-    }
+.chain-card.mid { border-left-color: var(--accent-magenta); }
+.chain-card.end { border-left-color: var(--accent-yellow); }
 
-    @keyframes fadeInNode {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+.step-tag {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
 
-    /* Game 3: Gravity Jukebox */
-    #synth-canvas {
-      width: 100%;
-      height: 480px;
-      background: #0a0b12;
-      display: block;
-      cursor: crosshair;
-    }
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .canvas-overlay-hints {
-      position: absolute;
-      bottom: 16px;
-      left: 20px;
-      pointer-events: none;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.4);
-    }
-  </style>
+/* GAME 3: GRAVITY JUKEBOX */
+#jukebox-wrap {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  background: #090b12;
+}
+
+#synth-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.canvas-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  pointer-events: none;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+}
+
+/* GAME 4: CHRONOS CLICKING */
+.chronos-stage {
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: radial-gradient(circle, #191f38 0%, #0c0e18 100%);
+  text-align: center;
+  padding: 20px;
+}
+
+.timer-display {
+  font-size: 4.5rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+}
+
+.chronos-btn {
+  padding: 16px 42px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
+  color: #05070d;
+  box-shadow: 0 10px 30px rgba(0, 242, 254, 0.35);
+  transition: transform 0.1s;
+}
+
+.chronos-btn:active {
+  transform: scale(0.95);
+}
+
+.chronos-feedback {
+  font-size: 1.05rem;
+  font-weight: 700;
+  min-height: 28px;
+}
+
+/* GAME 5: UNCLICKABLE BUTTON */
+#rogue-stage {
+  position: relative;
+  height: 460px;
+  width: 100%;
+  background: #0d0f1a;
+  overflow: hidden;
+}
+
+#rogue-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 900;
+  background: var(--accent-magenta);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(254, 1, 154, 0.4);
+  transition: top 0.12s ease-out, left 0.12s ease-out;
+  white-space: nowrap;
+}
+
+.taunt-banner {
+  position: absolute;
+  top: 20px;
+  width: 100%;
+  text-align: center;
+  font-weight: 800;
+  color: var(--accent-yellow);
+  font-size: 1rem;
+  pointer-events: none;
+}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="title-row">
+<header>
+  <div class="top-bar">
+    <div class="title-group">
       <h1>Paradox Arcade</h1>
-      <p class="subtitle">Interactive, physics-driven web experiments</p>
+      <p class="subtitle">5 Original Interactive Physics & Logic Toys</p>
     </div>
+    <button class="sound-btn" id="mute-btn" onclick="toggleMute()">🔊 Sound: ON</button>
+  </div>
 
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchGame('sorter', event)">Space Sorter</button>
-      <button class="tab-btn" onclick="switchGame('excuses', event)">Infinite Excuse Engine</button>
-      <button class="tab-btn" onclick="switchGame('jukebox', event)">Gravity Jukebox</button>
-    </nav>
-  </header>
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="openTab('sorter', this)">1. Space Sorter</button>
+    <button class="tab-btn" onclick="openTab('excuses', this)">2. Excuse Flowchart</button>
+    <button class="tab-btn" onclick="openTab('jukebox', this)">3. Gravity Jukebox</button>
+    <button class="tab-btn" onclick="openTab('chronos', this)">4. 5.000s Challenge</button>
+    <button class="tab-btn" onclick="openTab('rogue', this)">5. Unclickable Button</button>
+  </nav>
+</header>
 
-  <main>
-    <!-- Game 1: Space Debris Sorter -->
-    <section id="panel-sorter" class="game-panel active">
-      <div class="panel-header">
-        <div>
-          <h2>Space Debris Sorter</h2>
-          <span>Flick items into their matching vortexes</span>
-        </div>
-        <div class="score-badge">Stabilized: <span id="sorter-score">0</span></div>
+<main>
+  <!-- GAME 1: SPACE SORTER -->
+  <section id="panel-sorter" class="game-panel active">
+    <div class="panel-header">
+      <div>
+        <h2>Zero-G Space Debris Sorter</h2>
+        <span>Drag floating tech (💾) to Cyan and chaos (🌀) to Magenta</span>
       </div>
-      <div id="sorter-canvas-container">
-        <div class="vortex vortex-cyan">
-          <div>CYAN</div>
-          <small>TECH</small>
-        </div>
-        <div class="vortex vortex-magenta">
-          <div>MAGENTA</div>
-          <small>CHAOS</small>
-        </div>
+      <div class="stats-row">
+        <span style="color: var(--accent-green);">Score: <b id="sorter-score">0</b></span>
+        <span style="color: var(--accent-yellow);">Streak: <b id="sorter-streak">0</b></span>
       </div>
-    </section>
-
-    <!-- Game 2: The Infinite Excuse Generator -->
-    <section id="panel-excuses" class="game-panel">
-      <div class="panel-header">
-        <div>
-          <h2>The Escalation Flowchart</h2>
-          <span>Build progressively unhinged, branching justifications</span>
-        </div>
-        <button class="tab-btn" style="padding: 6px 14px;" onclick="resetExcuses()">Clear</button>
+    </div>
+    <div id="sorter-stage">
+      <div class="vortex vortex-cyan">
+        <div>CYAN</div>
+        <small>TECH</small>
       </div>
-      <div class="excuse-box">
-        <div class="excuse-controls">
-          <button class="excuse-btn" onclick="generateExcuse('homework')">"Forgot My Homework"</button>
-          <button class="excuse-btn" onclick="generateExcuse('late')">"Showed Up 40 Mins Late"</button>
-          <button class="excuse-btn" onclick="generateExcuse('chore')">"Did Not Clean My Room"</button>
-          <button class="excuse-btn" style="border-color: var(--accent-magenta);" onclick="escalateCurrent()">Escalate Logic +</button>
-        </div>
-        <div class="chain-container" id="excuse-chain"></div>
+      <div class="vortex vortex-magenta">
+        <div>MAGENTA</div>
+        <small>CHAOS</small>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Game 3: Gravity Jukebox -->
-    <section id="panel-jukebox" class="game-panel">
-      <div class="panel-header">
-        <div>
-          <h2>Gravity Jukebox</h2>
-          <span>Click to launch harmonic bounce emitters</span>
-        </div>
-        <button class="tab-btn" style="padding: 6px 14px;" onclick="clearSynthNodes()">Clear Screen</button>
+  <!-- GAME 2: EXCUSE ENGINE -->
+  <section id="panel-excuses" class="game-panel">
+    <div class="panel-header">
+      <div>
+        <h2>The Infinite Excuse Engine</h2>
+        <span>Generate ridiculously over-engineered alibis</span>
       </div>
-      <div style="position: relative; width: 100%; height: 480px;">
-        <canvas id="synth-canvas"></canvas>
-        <div class="canvas-overlay-hints">Click / Drag to spawn rhythmic gravity orbs</div>
+      <button class="action-chip" onclick="clearExcuses()">Reset Board</button>
+    </div>
+    <div class="excuse-stage">
+      <div class="btn-group">
+        <button class="excuse-btn" onclick="startExcuse('homework')">📚 Forgot Homework</button>
+        <button class="excuse-btn" onclick="startExcuse('late')">⏰ Woke Up Late</button>
+        <button class="excuse-btn" onclick="startExcuse('wifi')">📡 Disconnected in Match</button>
+        <button class="excuse-btn" style="border-color: var(--accent-magenta);" onclick="addEscalation()">⚡ Escalate Drama +</button>
+        <button class="excuse-btn" style="border-color: var(--accent-yellow);" onclick="copyExcuse()">📋 Copy Alibi</button>
       </div>
-    </section>
-  </main>
+      <div class="chain-list" id="excuse-list"></div>
+    </div>
+  </section>
 
-  <script>
-    let audioCtx = null;
+  <!-- GAME 3: GRAVITY JUKEBOX -->
+  <section id="panel-jukebox" class="game-panel">
+    <div class="panel-header">
+      <div>
+        <h2>Gravity Synth Jukebox</h2>
+        <span>Click anywhere to drop musical bouncing orbs</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="action-chip" onclick="shufflePegs()">Shuffle Pegs</button>
+        <button class="action-chip" onclick="clearBalls()">Clear Orbs</button>
+      </div>
+    </div>
+    <div id="jukebox-wrap">
+      <canvas id="synth-canvas"></canvas>
+      <div class="canvas-hint">Click or drag across the screen to spawn synth particles</div>
+    </div>
+  </section>
 
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+  <!-- GAME 4: CHRONOS CLICKING -->
+  <section id="panel-chronos" class="game-panel">
+    <div class="panel-header">
+      <div>
+        <h2>Chronos Precision Challenge</h2>
+        <span>Stop the quantum timer at exact 05.000 seconds</span>
+      </div>
+      <span style="color: var(--accent-yellow); font-weight:800;">Best Diff: <b id="chronos-best">--</b></span>
+    </div>
+    <div class="chronos-stage">
+      <div class="timer-display" id="chronos-Readout">00.000</div>
+      <button class="chronos-btn" id="chronos-trigger" onclick="toggleChronos()">START CLOCK</button>
+      <div class="chronos-feedback" id="chronos-msg">Target: Stop at exactly 5.000 seconds!</div>
+    </div>
+  </section>
+
+  <!-- GAME 5: UNCLICKABLE BUTTON -->
+  <section id="panel-rogue" class="game-panel">
+    <div class="panel-header">
+      <div>
+        <h2>The Unclickable Button</h2>
+        <span>Try to click the button. It really doesn't want you to.</span>
+      </div>
+      <span style="color: var(--accent-cyan); font-weight:800;">Miracle Clicks: <b id="rogue-score">0</b> | Dodges: <b id="rogue-dodges">0</b></span>
+    </div>
+    <div id="rogue-stage">
+      <div class="taunt-banner" id="rogue-taunt">Go ahead, click me. Easy points!</div>
+      <button id="rogue-btn" onclick="caughtRogue()">CLICK ME FOR $1,000,000</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =========================================================
+   SOUND SYNTHESIZER
+   ========================================================= */
+let audioCtx = null;
+let isMuted = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById('mute-btn').innerText = isMuted ? '🔇 Sound: OFF' : '🔊 Sound: ON';
+}
+
+function beep(freq = 440, type = 'sine', dur = 0.2) {
+  if (isMuted) return;
+  initAudio();
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+/* =========================================================
+   TAB NAVIGATION
+   ========================================================= */
+function openTab(id, btn) {
+  initAudio();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+
+  if (id === 'jukebox') {
+    setTimeout(resizeJukebox, 20);
+  }
+}
+
+/* =========================================================
+   GAME 1: ZERO-G SPACE SORTER
+   ========================================================= */
+const sorterStage = document.getElementById('sorter-stage');
+let sScore = 0;
+let sStreak = 0;
+let activeDebris = [];
+
+const DEBRIS_POOL = [
+  { name: "Fried Router", type: "tech" },
+  { name: "Missing Left Sock", type: "chaos" },
+  { name: "GTX 4090 Fan", type: "tech" },
+  { name: "Half-Eaten Samosa", type: "chaos" },
+  { name: "Corrupted USB", type: "tech" },
+  { name: "Flying Chappal", type: "chaos" },
+  { name: "Overclocked CPU", type: "tech" },
+  { name: "Geometry Box Compass", type: "chaos" }
+];
+
+function createDebris() {
+  if (activeDebris.length >= 6) return;
+  const item = DEBRIS_POOL[Math.floor(Math.random() * DEBRIS_POOL.length)];
+  const el = document.createElement('div');
+  el.className = 'debris-item ' + item.type;
+  el.innerHTML = (item.type === 'tech' ? '💾 ' : '🌀 ') + item.name;
+
+  const obj = {
+    el: el,
+    type: item.type,
+    x: sorterStage.clientWidth / 2 + (Math.random() * 140 - 70),
+    y: sorterStage.clientHeight / 2 + (Math.random() * 100 - 50),
+    vx: (Math.random() - 0.5) * 1.6,
+    vy: (Math.random() - 0.5) * 1.6,
+    dragging: false
+  };
+
+  setupDrag(obj);
+  sorterStage.appendChild(el);
+  activeDebris.push(obj);
+}
+
+function setupDrag(obj) {
+  let offsetX = 0, offsetY = 0;
+
+  obj.el.addEventListener('pointerdown', (e) => {
+    initAudio();
+    obj.dragging = true;
+    const rect = sorterStage.getBoundingClientRect();
+    offsetX = (e.clientX - rect.left) - obj.x;
+    offsetY = (e.clientY - rect.top) - obj.y;
+    obj.el.setPointerCapture(e.pointerId);
+  });
+
+  obj.el.addEventListener('pointermove', (e) => {
+    if (!obj.dragging) return;
+    const rect = sorterStage.getBoundingClientRect();
+    obj.x = (e.clientX - rect.left) - offsetX;
+    obj.y = (e.clientY - rect.top) - offsetY;
+    checkVortexHit(obj);
+  });
+
+  obj.el.addEventListener('pointerup', (e) => {
+    obj.dragging = false;
+    try { obj.el.releasePointerCapture(e.pointerId); } catch(err){}
+  });
+}
+
+function checkVortexHit(obj) {
+  const w = sorterStage.clientWidth;
+  const h = sorterStage.clientHeight;
+  const cyanX = w * 0.85, cyanY = h * 0.25;
+  const magX = w * 0.15, magY = h * 0.75;
+
+  if (Math.hypot(obj.x - cyanX, obj.y - cyanY) < 65) {
+    resolveDebris(obj, 'tech');
+  } else if (Math.hypot(obj.x - magX, obj.y - magY) < 65) {
+    resolveDebris(obj, 'chaos');
+  }
+}
+
+function resolveDebris(obj, holeType) {
+  if (!activeDebris.includes(obj)) return;
+  activeDebris = activeDebris.filter(d => d !== obj);
+  obj.el.remove();
+
+  if (obj.type === holeType) {
+    sScore += 10;
+    sStreak++;
+    beep(587.33, 'triangle', 0.2);
+  } else {
+    sStreak = 0;
+    beep(140, 'sawtooth', 0.3);
+  }
+
+  document.getElementById('sorter-score').innerText = sScore;
+  document.getElementById('sorter-streak').innerText = sStreak;
+  setTimeout(createDebris, 400);
+}
+
+function updateSorterPhysics() {
+  const w = sorterStage.clientWidth;
+  const h = sorterStage.clientHeight;
+
+  activeDebris.forEach(obj => {
+    if (!obj.dragging) {
+      obj.x += obj.vx;
+      obj.y += obj.vy;
+      if (obj.x < 60 || obj.x > w - 60) obj.vx *= -1;
+      if (obj.y < 30 || obj.y > h - 30) obj.vy *= -1;
     }
+    obj.el.style.left = obj.x + 'px';
+    obj.el.style.top = obj.y + 'px';
+  });
+  requestAnimationFrame(updateSorterPhysics);
+}
 
-    function playTone(freq, type = 'sine', duration = 0.3) {
-      initAudio();
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+setInterval(createDebris, 2000);
+setTimeout(createDebris, 200);
+requestAnimationFrame(updateSorterPhysics);
 
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+/* =========================================================
+   GAME 2: INFINITE EXCUSE ENGINE
+   ========================================================= */
+const excuseList = document.getElementById('excuse-list');
 
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+const EXCUSE_DATA = {
+  homework: [
+    "My notebook got sucked into a localized gravitational anomaly inside my school bag.",
+    "A rogue AI toaster hijacked my desk lamp and demanded I solve riddles all night.",
+    "My pen ran out of normal ink and started writing in invisible 4th-dimensional font."
+  ],
+  late: [
+    "A gang of aggressive squirrels blocked the main road demanding toll tax.",
+    "Time temporarily froze in my bedroom due to excessive blanket warmth.",
+    "My alarm clock updated its firmware at 6:59 AM and rebooted into French."
+  ],
+  wifi: [
+    "Solar flares specifically targeted my router right as I was about to clutch the round.",
+    "A pigeon sat on the fiber optic cable outside and absorbed my ping.",
+    "My ISP accidentally routed my packets through the International Space Station."
+  ],
+  middle: [
+    "Which immediately alerted three undercover scientists from ISRO.",
+    "Causing a chain reaction that made my neighbor's inverter beep in Morse code.",
+    "So the local authorities declared my study table a high-security containment zone.",
+    "And my younger cousin accidentally traded the evidence for two packets of Maggi."
+  ],
+  ending: [
+    "Therefore, asking me to repeat the task would violate the laws of thermodynamics.",
+    "Which proves beyond doubt that I actually deserve bonus marks for surviving.",
+    "So technically, it wasn't my fault—it was a canon event."
+  ]
+};
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+function startExcuse(category) {
+  clearExcuses();
+  beep(440, 'sine', 0.15);
+  const pool = EXCUSE_DATA[category];
+  appendExcuseCard("Step 1: The Trigger Event", pool[Math.floor(Math.random() * pool.length)], '');
 
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {}
-    }
+  setTimeout(() => {
+    addEscalation();
+  }, 220);
 
-    function switchGame(gameId, evt) {
-      initAudio();
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  setTimeout(() => {
+    const endPool = EXCUSE_DATA.ending;
+    appendExcuseCard("Final Verdict", endPool[Math.floor(Math.random() * endPool.length)], 'end');
+    beep(659.25, 'triangle', 0.25);
+  }, 450);
+}
 
-      if (evt && evt.target) {
-        evt.target.classList.add('active');
-      }
-      document.getElementById('panel-' + gameId).classList.add('active');
+function addEscalation() {
+  const midPool = EXCUSE_DATA.middle;
+  appendExcuseCard("Complication Twist", midPool[Math.floor(Math.random() * midPool.length)], 'mid');
+  beep(523.25, 'sine', 0.15);
+}
 
-      if (gameId === 'jukebox') {
-        resizeSynthCanvas();
-      }
-    }
+function appendExcuseCard(label, text, cls) {
+  const div = document.createElement('div');
+  div.className = 'chain-card ' + cls;
+  div.innerHTML = `<div class="step-tag">${label}</div><div>${text}</div>`;
+  excuseList.appendChild(div);
+  excuseList.scrollTop = excuseList.scrollHeight;
+}
 
-    /* Game 1: Space Debris */
-    const sorterContainer = document.getElementById('sorter-canvas-container');
-    const scoreVal = document.getElementById('sorter-score');
-    let sortedCount = 0;
+function clearExcuses() {
+  excuseList.innerHTML = '';
+}
 
-    const DEBRIS_ITEMS = [
-      { text: "Lost Left Sock", type: "chaos" },
-      { text: "Overheating Router", type: "tech" },
-      { text: "Unfinished Novel", type: "chaos" },
-      { text: "Glitchy GPU", type: "tech" },
-      { text: "Sentient Toaster", type: "tech" },
-      { text: "Cereal Without Milk", type: "chaos" },
-      { text: "Ancient Floppy Disk", type: "tech" },
-      { text: "Quantum Hamster", type: "chaos" }
-    ];
+function copyExcuse() {
+  const cards = Array.from(excuseList.querySelectorAll('.chain-card'));
+  if (!cards.length) return;
+  const fullText = cards.map(c => c.innerText.replace(/\n/g, ': ')).join(' -> ');
+  navigator.clipboard.writeText(fullText);
+  beep(880, 'sine', 0.2);
+  alert("Full excuse copied to clipboard!");
+}
 
-    function spawnDebris() {
-      if (sorterContainer.children.length > 7) return;
+/* =========================================================
+   GAME 3: GRAVITY JUKEBOX
+   ========================================================= */
+const jCanvas = document.getElementById('synth-canvas');
+const jCtx = jCanvas.getContext('2d');
+let orbs = [];
+let pegs = [];
+const NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
 
-      const meta = DEBRIS_ITEMS[Math.floor(Math.random() * DEBRIS_ITEMS.length)];
-      const el = document.createElement('div');
-      el.className = `debris-chip ${meta.type}`;
-      el.innerHTML = `<span>${meta.type === 'tech' ? '💾' : '🌀'}</span> ${meta.text}`;
-      el.dataset.type = meta.type;
+function resizeJukebox() {
+  const wrap = document.getElementById('jukebox-wrap');
+  jCanvas.width = wrap.clientWidth || 800;
+  jCanvas.height = wrap.clientHeight || 460;
+  if (pegs.length === 0) shufflePegs();
+}
 
-      const startX = sorterContainer.clientWidth / 2 + (Math.random() * 120 - 60);
-      const startY = sorterContainer.clientHeight / 2 + (Math.random() * 80 - 40);
+function shufflePegs() {
+  pegs = [];
+  const w = jCanvas.width || 800;
+  const h = jCanvas.height || 460;
+  const rows = 4, cols = 7;
 
-      el.style.left = startX + 'px';
-      el.style.top = startY + 'px';
-
-      makeDraggable(el);
-      sorterContainer.appendChild(el);
-    }
-
-    function makeDraggable(el) {
-      let isDragging = false;
-      let startX, startY, initLeft, initTop;
-
-      const onPointerDown = (e) => {
-        initAudio();
-        isDragging = true;
-        startX = e.clientX || e.touches[0].clientX;
-        startY = e.clientY || e.touches[0].clientY;
-        initLeft = parseFloat(el.style.left);
-        initTop = parseFloat(el.style.top);
-        el.setPointerCapture(e.pointerId);
-      };
-
-      const onPointerMove = (e) => {
-        if (!isDragging) return;
-        const currentX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-        const currentY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-        const dx = currentX - startX;
-        const dy = currentY - startY;
-
-        const posX = initLeft + dx;
-        const posY = initTop + dy;
-
-        el.style.left = posX + 'px';
-        el.style.top = posY + 'px';
-
-        checkVortexProximity(el, posX, posY);
-      };
-
-      const onPointerUp = (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        try { el.releasePointerCapture(e.pointerId); } catch(err) {}
-      };
-
-      el.addEventListener('pointerdown', onPointerDown);
-      el.addEventListener('pointermove', onPointerMove);
-      el.addEventListener('pointerup', onPointerUp);
-    }
-
-    function checkVortexProximity(el, x, y) {
-      const rect = sorterContainer.getBoundingClientRect();
-      const cyanTarget = { x: rect.width * 0.85, y: rect.height * 0.25 };
-      const magentaTarget = { x: rect.width * 0.15, y: rect.height * 0.75 };
-
-      const distCyan = Math.hypot(x - cyanTarget.x, y - cyanTarget.y);
-      const distMagenta = Math.hypot(x - magentaTarget.x, y - magentaTarget.y);
-
-      if (distCyan < 65) {
-        handleAbsorb(el, 'tech', 523.25);
-      } else if (distMagenta < 65) {
-        handleAbsorb(el, 'chaos', 392.00);
-      }
-    }
-
-    function handleAbsorb(el, expectedType, noteFreq) {
-      const actualType = el.dataset.type;
-      if (actualType === expectedType) {
-        sortedCount++;
-        scoreVal.innerText = sortedCount;
-        playTone(noteFreq, 'triangle', 0.25);
-      } else {
-        playTone(150, 'sawtooth', 0.35);
-      }
-      el.remove();
-      setTimeout(spawnDebris, 500);
-    }
-
-    setInterval(spawnDebris, 2200);
-    setTimeout(spawnDebris, 200);
-
-    /* Game 2: Excuse Generator */
-    const excuseChain = document.getElementById('excuse-chain');
-
-    const BASE_PREMISES = {
-      homework: [
-        "My notebook was temporarily borrowed by a self-aware microwave.",
-        "Gravity reversed strictly inside my backpack between 8 and 10 PM.",
-        "My pencil sharpener opened a miniature spacetime fissure."
-      ],
-      late: [
-        "The bus took an unscheduled dimensional detour through a parallel realm.",
-        "A flock of pigeons was staging a silent, peaceful sidewalk sit-in.",
-        "My alarm clock joined a union and went on strike for reasonable hours."
-      ],
-      chore: [
-        "A tribe of sentient dust bunnies requested safe diplomatic harbor in my closet.",
-        "I reorganized my wardrobe according to quantum probability states.",
-        "My vacuum cleaner exhibited symptoms of existential dread."
-      ]
-    };
-
-    const ESCALATIONS = [
-      "Naturally, the local municipal council called an emergency vote on the matter.",
-      "This immediately drew the attention of three rogue astrophysicists.",
-      "Which created an unavoidable feedback loop with my neighbor's leaf blower.",
-      "Prompting the United Nations to declare my bedroom an international neutral zone."
-    ];
-
-    const RESOLUTIONS = [
-      "Therefore, proceeding with conventional obligations would breach cosmic protocol.",
-      "Hence, any attempt to verify this will collapse the wave function.",
-      "Which proves that doing it tomorrow morning is the only safe mathematical move."
-    ];
-
-    function generateExcuse(type) {
-      initAudio();
-      playTone(440, 'sine', 0.15);
-      excuseChain.innerHTML = '';
-
-      const premise = BASE_PREMISES[type][Math.floor(Math.random() * BASE_PREMISES[type].length)];
-      addNode("Initial Anomaly", premise, "");
-
-      setTimeout(() => {
-        const esc = ESCALATIONS[Math.floor(Math.random() * ESCALATIONS.length)];
-        addNode("Cascading Problem", esc, "escalated");
-        playTone(587.33, 'sine', 0.15);
-      }, 250);
-
-      setTimeout(() => {
-        const res = RESOLUTIONS[Math.floor(Math.random() * RESOLUTIONS.length)];
-        addNode("Inescapable Conclusion", res, "absurd");
-        playTone(880, 'sine', 0.25);
-      }, 500);
-    }
-
-    function escalateCurrent() {
-      initAudio();
-      const esc = ESCALATIONS[Math.floor(Math.random() * ESCALATIONS.length)];
-      addNode("Further Escalation", esc, "escalated");
-      playTone(659.25, 'triangle', 0.2);
-    }
-
-    function addNode(title, text, styleClass) {
-      const node = document.createElement('div');
-      node.className = `chain-node ${styleClass}`;
-      node.innerHTML = `
-        <div class="chain-step">${title}</div>
-        <div class="chain-text">${text}</div>
-      `;
-      excuseChain.appendChild(node);
-      node.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function resetExcuses() {
-      excuseChain.innerHTML = '';
-    }
-
-    /* Game 3: Gravity Jukebox */
-    const canvas = document.getElementById('synth-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let pegs = [];
-
-    const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
-
-    function resizeSynthCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      buildPegField();
-    }
-
-    function buildPegField() {
-      pegs = [];
-      const cols = 7;
-      const rows = 4;
-      const spacingX = canvas.width / (cols + 1);
-      const spacingY = canvas.height / (rows + 2);
-
-      for (let r = 1; r <= rows; r++) {
-        for (let c = 1; c <= cols; c++) {
-          const offsetX = (r % 2 === 0) ? spacingX * 0.5 : 0;
-          pegs.push({
-            x: c * spacingX + offsetX,
-            y: r * spacingY + 30,
-            radius: 6,
-            glow: 0
-          });
-        }
-      }
-    }
-
-    class Particle {
-      constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.vx = (Math.random() - 0.5) * 4;
-        this.vy = Math.random() * 2;
-        this.radius = 7;
-        this.color = Math.random() > 0.5 ? '#00f2fe' : '#fe019a';
-        this.life = 360;
-      }
-
-      update() {
-        this.vy += 0.15;
-        this.x += this.vx;
-        this.y += this.vy;
-        this.life--;
-
-        if (this.y + this.radius > canvas.height) {
-          this.y = canvas.height - this.radius;
-          this.vy = -this.vy * 0.7;
-          playTone(PENTATONIC[0], 'sine', 0.1);
-        }
-
-        if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-          this.vx = -this.vx;
-        }
-
-        pegs.forEach((peg, index) => {
-          const dist = Math.hypot(this.x - peg.x, this.y - peg.y);
-          if (dist < this.radius + peg.radius) {
-            const angle = Math.atan2(this.y - peg.y, this.x - peg.x);
-            this.vx = Math.cos(angle) * 3.5;
-            this.vy = Math.sin(angle) * 3.5;
-            peg.glow = 1.0;
-
-            const note = PENTATONIC[index % PENTATONIC.length];
-            playTone(note, 'triangle', 0.18);
-          }
-        });
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    function loop() {
-      ctx.fillStyle = 'rgba(10, 11, 18, 0.25)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      pegs.forEach(peg => {
-        ctx.beginPath();
-        ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
-        ctx.fillStyle = peg.glow > 0.1 ? '#ffd000' : '#2b314d';
-        ctx.shadowBlur = peg.glow * 15;
-        ctx.shadowColor = '#ffd000';
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        peg.glow *= 0.92;
+  for (let r = 1; r <= rows; r++) {
+    for (let c = 1; c <= cols; c++) {
+      const jitter = (Math.random() - 0.5) * 35;
+      pegs.push({
+        x: (w / (cols + 1)) * c + jitter,
+        y: (h / (rows + 1.5)) * r + 20,
+        r: 7,
+        glow: 0,
+        note: NOTES[(r * c) % NOTES.length]
       });
+    }
+  }
+}
 
-      particles = particles.filter(p => p.life > 0);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
+function spawnOrb(x, y) {
+  orbs.push({
+    x: x,
+    y: y,
+    vx: (Math.random() - 0.5) * 5,
+    vy: Math.random() * 2,
+    r: 7,
+    color: Math.random() > 0.5 ? '#00f2fe' : '#fe019a',
+    life: 420
+  });
+}
 
-      requestAnimationFrame(loop);
+jCanvas.addEventListener('pointerdown', (e) => {
+  initAudio();
+  const rect = jCanvas.getBoundingClientRect();
+  for (let i = 0; i < 3; i++) {
+    spawnOrb(e.clientX - rect.left + (Math.random() * 12 - 6), e.clientY - rect.top);
+  }
+});
+
+function clearBalls() {
+  orbs = [];
+}
+
+function jukeboxLoop() {
+  jCtx.fillStyle = 'rgba(9, 11, 18, 0.28)';
+  jCtx.fillRect(0, 0, jCanvas.width, jCanvas.height);
+
+  pegs.forEach(p => {
+    jCtx.beginPath();
+    jCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    jCtx.fillStyle = p.glow > 0.1 ? '#ffd000' : '#283052';
+    jCtx.fill();
+    p.glow *= 0.9;
+  });
+
+  orbs = orbs.filter(o => o.life > 0);
+  orbs.forEach(o => {
+    o.vy += 0.16;
+    o.x += o.vx;
+    o.y += o.vy;
+    o.life--;
+
+    if (o.x < o.r || o.x > jCanvas.width - o.r) o.vx *= -1;
+    if (o.y > jCanvas.height - o.r) {
+      o.y = jCanvas.height - o.r;
+      o.vy *= -0.72;
+      beep(196, 'sine', 0.1);
     }
 
-    canvas.addEventListener('pointerdown', (e) => {
-      initAudio();
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      for (let i = 0; i < 3; i++) {
-        particles.push(new Particle(x + (Math.random() * 10 - 5), y));
+    pegs.forEach(p => {
+      const dist = Math.hypot(o.x - p.x, o.y - p.y);
+      if (dist < o.r + p.r) {
+        const ang = Math.atan2(o.y - p.y, o.x - p.x);
+        o.vx = Math.cos(ang) * 4.2;
+        o.vy = Math.sin(ang) * 4.2;
+        p.glow = 1;
+        beep(p.note, 'triangle', 0.16);
       }
     });
 
-    function clearSynthNodes() {
-      particles = [];
+    jCtx.beginPath();
+    jCtx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+    jCtx.fillStyle = o.color;
+    jCtx.fill();
+  });
+
+  requestAnimationFrame(jukeboxLoop);
+}
+
+window.addEventListener('resize', resizeJukebox);
+resizeJukebox();
+requestAnimationFrame(jukeboxLoop);
+
+/* =========================================================
+   GAME 4: CHRONOS 5.000s CHALLENGE
+   ========================================================= */
+let chronosRunning = false;
+let chronosStart = 0;
+let chronosRaf = null;
+let bestDiff = Infinity;
+
+function toggleChronos() {
+  initAudio();
+  const btn = document.getElementById('chronos-trigger');
+  const readout = document.getElementById('chronos-Readout');
+  const msg = document.getElementById('chronos-msg');
+
+  if (!chronosRunning) {
+    chronosRunning = true;
+    chronosStart = performance.now();
+    btn.innerText = "STOP AT 05.000!";
+    btn.style.background = "linear-gradient(135deg, #fe019a, #ff5100)";
+    msg.innerText = "Focus... feel the milliseconds...";
+    beep(440, 'sine', 0.1);
+    updateChronos();
+  } else {
+    chronosRunning = false;
+    cancelAnimationFrame(chronosRaf);
+    const elapsed = (performance.now() - chronosStart) / 1000;
+    readout.innerText = elapsed.toFixed(3).padStart(6, '0');
+    btn.innerText = "TRY AGAIN";
+    btn.style.background = "linear-gradient(135deg, var(--accent-cyan), #0088ff)";
+
+    const diff = Math.abs(5.000 - elapsed);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      document.getElementById('chronos-best').innerText = diff.toFixed(3) + 's';
     }
 
-    window.addEventListener('resize', resizeSynthCanvas);
-    resizeSynthCanvas();
-    requestAnimationFrame(loop);
-  </script>
+    if (diff === 0) {
+      msg.innerText = "🔥 IMPOSSIBLE! EXACT 5.000s GOD MODE!";
+      beep(880, 'triangle', 0.5);
+    } else if (diff < 0.05) {
+      msg.innerText = `⚡ Insane reflexes! Only off by ${(diff * 1000).toFixed(0)} milliseconds!`;
+      beep(659.25, 'triangle', 0.3);
+    } else if (diff < 0.25) {
+      msg.innerText = `👍 Pretty close! Off by ${diff.toFixed(3)} seconds.`;
+      beep(523.25, 'sine', 0.2);
+    } else {
+      msg.innerText = `💀 Way off by ${diff.toFixed(3)} seconds. Try again!`;
+      beep(160, 'sawtooth', 0.3);
+    }
+  }
+}
+
+function updateChronos() {
+  if (!chronosRunning) return;
+  const elapsed = (performance.now() - chronosStart) / 1000;
+  document.getElementById('chronos-Readout').innerText = elapsed.toFixed(3).padStart(6, '0');
+  chronosRaf = requestAnimationFrame(updateChronos);
+}
+
+/* =========================================================
+   GAME 5: THE UNCLICKABLE BUTTON
+   ========================================================= */
+const rogueStage = document.getElementById('rogue-stage');
+const rogueBtn = document.getElementById('rogue-btn');
+const rogueTaunt = document.getElementById('rogue-taunt');
+let rDodges = 0;
+let rScore = 0;
+
+const TAUNTS = [
+  "Too slow bro! 😂",
+  "Nice try, upgrade your mouse DPI!",
+  "Almost had me (not really).",
+  "My reflexes are coded in JavaScript!",
+  "Lag? Or just skill issue? 👀",
+  "Missed me by a mile!",
+  "You're burning calories chasing a button."
+];
+
+function evadeCursor() {
+  rDodges++;
+  document.getElementById('rogue-dodges').innerText = rDodges;
+  beep(300 + (rDodges % 10) * 40, 'sine', 0.08);
+
+  const pad = 80;
+  const maxX = rogueStage.clientWidth - pad * 2;
+  const maxY = rogueStage.clientHeight - pad * 2;
+
+  const newX = pad + Math.random() * maxX;
+  const newY = pad + 40 + Math.random() * (maxY - 40);
+
+  rogueBtn.style.left = newX + 'px';
+  rogueBtn.style.top = newY + 'px';
+  rogueTaunt.innerText = TAUNTS[Math.floor(Math.random() * TAUNTS.length)];
+}
+
+rogueBtn.addEventListener('pointerenter', evadeCursor);
+
+function caughtRogue() {
+  rScore++;
+  document.getElementById('rogue-score').innerText = rScore;
+  rogueTaunt.innerText = "😱 WHAT?! YOU ACTUALLY CLICKED ME?! HACKER!";
+  beep(880, 'triangle', 0.4);
+}
+</script>
 </body>
 </html>
