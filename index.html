@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paradox Arcade</title>
+  <style>
+    :root {
+      --bg: #090a10;
+      --card-bg: #121420;
+      --accent-cyan: #00f2fe;
+      --accent-magenta: #fe019a;
+      --accent-yellow: #ffd000;
+      --text-main: #f0f4fc;
+      --text-dim: #7f8a9e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 900px;
+      padding: 24px 20px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-row {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Tab Switcher */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      background: #171a2b;
+      padding: 6px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 10px 20px;
+      border-radius: 99px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: #232840;
+      color: var(--text-main);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: #fff;
+    }
+
+    /* Stage */
+    main {
+      width: 100%;
+      max-width: 900px;
+      padding: 16px 20px 30px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .game-panel {
+      display: none;
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .game-panel.active {
+      display: flex;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .panel-header h2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .panel-header span {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* Game 1: Space Debris Sorter */
+    #sorter-canvas-container {
+      position: relative;
+      height: 480px;
+      width: 100%;
+      background: radial-gradient(circle at center, #151829 0%, #0d0f1a 100%);
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    #sorter-canvas-container:active {
+      cursor: grabbing;
+    }
+
+    .vortex {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      animation: rotateVortex 6s linear infinite;
+    }
+
+    .vortex-cyan {
+      top: 25%;
+      right: 15%;
+      border: 3px dashed var(--accent-cyan);
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.25);
+      color: var(--accent-cyan);
+    }
+
+    .vortex-magenta {
+      bottom: 25%;
+      left: 15%;
+      border: 3px dashed var(--accent-magenta);
+      box-shadow: 0 0 30px rgba(254, 1, 154, 0.25);
+      color: var(--accent-magenta);
+    }
+
+    @keyframes rotateVortex {
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .debris-chip {
+      position: absolute;
+      padding: 10px 16px;
+      border-radius: 50px;
+      background: #252b45;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid transparent;
+      transform: translate(-50%, -50%);
+      transition: border-color 0.15s ease;
+    }
+
+    .debris-chip.tech { border-color: rgba(0, 242, 254, 0.4); }
+    .debris-chip.chaos { border-color: rgba(254, 1, 154, 0.4); }
+
+    .score-badge {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--accent-yellow);
+    }
+
+    /* Game 2: The Infinite Excuse Generator */
+    .excuse-box {
+      padding: 30px 24px;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: #0f111a;
+    }
+
+    .excuse-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .excuse-btn {
+      background: linear-gradient(135deg, #2b3254, #1b2038);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    .excuse-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
+      border-color: var(--accent-cyan);
+    }
+
+    .chain-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .chain-node {
+      background: #171b2c;
+      border-left: 4px solid var(--accent-cyan);
+      padding: 16px 18px;
+      border-radius: 8px;
+      animation: fadeInNode 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .chain-node.escalated {
+      border-left-color: var(--accent-magenta);
+    }
+
+    .chain-node.absurd {
+      border-left-color: var(--accent-yellow);
+    }
+
+    .chain-step {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .chain-text {
+      font-size: 1rem;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    @keyframes fadeInNode {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Game 3: Gravity Jukebox */
+    #synth-canvas {
+      width: 100%;
+      height: 480px;
+      background: #0a0b12;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .canvas-overlay-hints {
+      position: absolute;
+      bottom: 16px;
+      left: 20px;
+      pointer-events: none;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-row">
+      <h1>Paradox Arcade</h1>
+      <p class="subtitle">Interactive, physics-driven web experiments</p>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchGame('sorter', event)">Space Sorter</button>
+      <button class="tab-btn" onclick="switchGame('excuses', event)">Infinite Excuse Engine</button>
+      <button class="tab-btn" onclick="switchGame('jukebox', event)">Gravity Jukebox</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Game 1: Space Debris Sorter -->
+    <section id="panel-sorter" class="game-panel active">
+      <div class="panel-header">
+        <div>
+          <h2>Space Debris Sorter</h2>
+          <span>Flick items into their matching vortexes</span>
+        </div>
+        <div class="score-badge">Stabilized: <span id="sorter-score">0</span></div>
+      </div>
+      <div id="sorter-canvas-container">
+        <div class="vortex vortex-cyan">
+          <div>CYAN</div>
+          <small>TECH</small>
+        </div>
+        <div class="vortex vortex-magenta">
+          <div>MAGENTA</div>
+          <small>CHAOS</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game 2: The Infinite Excuse Generator -->
+    <section id="panel-excuses" class="game-panel">
+      <div class="panel-header">
+        <div>
+          <h2>The Escalation Flowchart</h2>
+          <span>Build progressively unhinged, branching justifications</span>
+        </div>
+        <button class="tab-btn" style="padding: 6px 14px;" onclick="resetExcuses()">Clear</button>
+      </div>
+      <div class="excuse-box">
+        <div class="excuse-controls">
+          <button class="excuse-btn" onclick="generateExcuse('homework')">"Forgot My Homework"</button>
+          <button class="excuse-btn" onclick="generateExcuse('late')">"Showed Up 40 Mins Late"</button>
+          <button class="excuse-btn" onclick="generateExcuse('chore')">"Did Not Clean My Room"</button>
+          <button class="excuse-btn" style="border-color: var(--accent-magenta);" onclick="escalateCurrent()">Escalate Logic +</button>
+        </div>
+        <div class="chain-container" id="excuse-chain"></div>
+      </div>
+    </section>
+
+    <!-- Game 3: Gravity Jukebox -->
+    <section id="panel-jukebox" class="game-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Gravity Jukebox</h2>
+          <span>Click to launch harmonic bounce emitters</span>
+        </div>
+        <button class="tab-btn" style="padding: 6px 14px;" onclick="clearSynthNodes()">Clear Screen</button>
+      </div>
+      <div style="position: relative; width: 100%; height: 480px;">
+        <canvas id="synth-canvas"></canvas>
+        <div class="canvas-overlay-hints">Click / Drag to spawn rhythmic gravity orbs</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.3) {
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function switchGame(gameId, evt) {
+      initAudio();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+      document.getElementById('panel-' + gameId).classList.add('active');
+
+      if (gameId === 'jukebox') {
+        resizeSynthCanvas();
+      }
+    }
+
+    /* Game 1: Space Debris */
+    const sorterContainer = document.getElementById('sorter-canvas-container');
+    const scoreVal = document.getElementById('sorter-score');
+    let sortedCount = 0;
+
+    const DEBRIS_ITEMS = [
+      { text: "Lost Left Sock", type: "chaos" },
+      { text: "Overheating Router", type: "tech" },
+      { text: "Unfinished Novel", type: "chaos" },
+      { text: "Glitchy GPU", type: "tech" },
+      { text: "Sentient Toaster", type: "tech" },
+      { text: "Cereal Without Milk", type: "chaos" },
+      { text: "Ancient Floppy Disk", type: "tech" },
+      { text: "Quantum Hamster", type: "chaos" }
+    ];
+
+    function spawnDebris() {
+      if (sorterContainer.children.length > 7) return;
+
+      const meta = DEBRIS_ITEMS[Math.floor(Math.random() * DEBRIS_ITEMS.length)];
+      const el = document.createElement('div');
+      el.className = `debris-chip ${meta.type}`;
+      el.innerHTML = `<span>${meta.type === 'tech' ? '💾' : '🌀'}</span> ${meta.text}`;
+      el.dataset.type = meta.type;
+
+      const startX = sorterContainer.clientWidth / 2 + (Math.random() * 120 - 60);
+      const startY = sorterContainer.clientHeight / 2 + (Math.random() * 80 - 40);
+
+      el.style.left = startX + 'px';
+      el.style.top = startY + 'px';
+
+      makeDraggable(el);
+      sorterContainer.appendChild(el);
+    }
+
+    function makeDraggable(el) {
+      let isDragging = false;
+      let startX, startY, initLeft, initTop;
+
+      const onPointerDown = (e) => {
+        initAudio();
+        isDragging = true;
+        startX = e.clientX || e.touches[0].clientX;
+        startY = e.clientY || e.touches[0].clientY;
+        initLeft = parseFloat(el.style.left);
+        initTop = parseFloat(el.style.top);
+        el.setPointerCapture(e.pointerId);
+      };
+
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        const currentX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        const currentY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        const dx = currentX - startX;
+        const dy = currentY - startY;
+
+        const posX = initLeft + dx;
+        const posY = initTop + dy;
+
+        el.style.left = posX + 'px';
+        el.style.top = posY + 'px';
+
+        checkVortexProximity(el, posX, posY);
+      };
+
+      const onPointerUp = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        try { el.releasePointerCapture(e.pointerId); } catch(err) {}
+      };
+
+      el.addEventListener('pointerdown', onPointerDown);
+      el.addEventListener('pointermove', onPointerMove);
+      el.addEventListener('pointerup', onPointerUp);
+    }
+
+    function checkVortexProximity(el, x, y) {
+      const rect = sorterContainer.getBoundingClientRect();
+      const cyanTarget = { x: rect.width * 0.85, y: rect.height * 0.25 };
+      const magentaTarget = { x: rect.width * 0.15, y: rect.height * 0.75 };
+
+      const distCyan = Math.hypot(x - cyanTarget.x, y - cyanTarget.y);
+      const distMagenta = Math.hypot(x - magentaTarget.x, y - magentaTarget.y);
+
+      if (distCyan < 65) {
+        handleAbsorb(el, 'tech', 523.25);
+      } else if (distMagenta < 65) {
+        handleAbsorb(el, 'chaos', 392.00);
+      }
+    }
+
+    function handleAbsorb(el, expectedType, noteFreq) {
+      const actualType = el.dataset.type;
+      if (actualType === expectedType) {
+        sortedCount++;
+        scoreVal.innerText = sortedCount;
+        playTone(noteFreq, 'triangle', 0.25);
+      } else {
+        playTone(150, 'sawtooth', 0.35);
+      }
+      el.remove();
+      setTimeout(spawnDebris, 500);
+    }
+
+    setInterval(spawnDebris, 2200);
+    setTimeout(spawnDebris, 200);
+
+    /* Game 2: Excuse Generator */
+    const excuseChain = document.getElementById('excuse-chain');
+
+    const BASE_PREMISES = {
+      homework: [
+        "My notebook was temporarily borrowed by a self-aware microwave.",
+        "Gravity reversed strictly inside my backpack between 8 and 10 PM.",
+        "My pencil sharpener opened a miniature spacetime fissure."
+      ],
+      late: [
+        "The bus took an unscheduled dimensional detour through a parallel realm.",
+        "A flock of pigeons was staging a silent, peaceful sidewalk sit-in.",
+        "My alarm clock joined a union and went on strike for reasonable hours."
+      ],
+      chore: [
+        "A tribe of sentient dust bunnies requested safe diplomatic harbor in my closet.",
+        "I reorganized my wardrobe according to quantum probability states.",
+        "My vacuum cleaner exhibited symptoms of existential dread."
+      ]
+    };
+
+    const ESCALATIONS = [
+      "Naturally, the local municipal council called an emergency vote on the matter.",
+      "This immediately drew the attention of three rogue astrophysicists.",
+      "Which created an unavoidable feedback loop with my neighbor's leaf blower.",
+      "Prompting the United Nations to declare my bedroom an international neutral zone."
+    ];
+
+    const RESOLUTIONS = [
+      "Therefore, proceeding with conventional obligations would breach cosmic protocol.",
+      "Hence, any attempt to verify this will collapse the wave function.",
+      "Which proves that doing it tomorrow morning is the only safe mathematical move."
+    ];
+
+    function generateExcuse(type) {
+      initAudio();
+      playTone(440, 'sine', 0.15);
+      excuseChain.innerHTML = '';
+
+      const premise = BASE_PREMISES[type][Math.floor(Math.random() * BASE_PREMISES[type].length)];
+      addNode("Initial Anomaly", premise, "");
+
+      setTimeout(() => {
+        const esc = ESCALATIONS[Math.floor(Math.random() * ESCALATIONS.length)];
+        addNode("Cascading Problem", esc, "escalated");
+        playTone(587.33, 'sine', 0.15);
+      }, 250);
+
+      setTimeout(() => {
+        const res = RESOLUTIONS[Math.floor(Math.random() * RESOLUTIONS.length)];
+        addNode("Inescapable Conclusion", res, "absurd");
+        playTone(880, 'sine', 0.25);
+      }, 500);
+    }
+
+    function escalateCurrent() {
+      initAudio();
+      const esc = ESCALATIONS[Math.floor(Math.random() * ESCALATIONS.length)];
+      addNode("Further Escalation", esc, "escalated");
+      playTone(659.25, 'triangle', 0.2);
+    }
+
+    function addNode(title, text, styleClass) {
+      const node = document.createElement('div');
+      node.className = `chain-node ${styleClass}`;
+      node.innerHTML = `
+        <div class="chain-step">${title}</div>
+        <div class="chain-text">${text}</div>
+      `;
+      excuseChain.appendChild(node);
+      node.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetExcuses() {
+      excuseChain.innerHTML = '';
+    }
+
+    /* Game 3: Gravity Jukebox */
+    const canvas = document.getElementById('synth-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let pegs = [];
+
+    const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+
+    function resizeSynthCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      buildPegField();
+    }
+
+    function buildPegField() {
+      pegs = [];
+      const cols = 7;
+      const rows = 4;
+      const spacingX = canvas.width / (cols + 1);
+      const spacingY = canvas.height / (rows + 2);
+
+      for (let r = 1; r <= rows; r++) {
+        for (let c = 1; c <= cols; c++) {
+          const offsetX = (r % 2 === 0) ? spacingX * 0.5 : 0;
+          pegs.push({
+            x: c * spacingX + offsetX,
+            y: r * spacingY + 30,
+            radius: 6,
+            glow: 0
+          });
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = Math.random() * 2;
+        this.radius = 7;
+        this.color = Math.random() > 0.5 ? '#00f2fe' : '#fe019a';
+        this.life = 360;
+      }
+
+      update() {
+        this.vy += 0.15;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life--;
+
+        if (this.y + this.radius > canvas.height) {
+          this.y = canvas.height - this.radius;
+          this.vy = -this.vy * 0.7;
+          playTone(PENTATONIC[0], 'sine', 0.1);
+        }
+
+        if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
+          this.vx = -this.vx;
+        }
+
+        pegs.forEach((peg, index) => {
+          const dist = Math.hypot(this.x - peg.x, this.y - peg.y);
+          if (dist < this.radius + peg.radius) {
+            const angle = Math.atan2(this.y - peg.y, this.x - peg.x);
+            this.vx = Math.cos(angle) * 3.5;
+            this.vy = Math.sin(angle) * 3.5;
+            peg.glow = 1.0;
+
+            const note = PENTATONIC[index % PENTATONIC.length];
+            playTone(note, 'triangle', 0.18);
+          }
+        });
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function loop() {
+      ctx.fillStyle = 'rgba(10, 11, 18, 0.25)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      pegs.forEach(peg => {
+        ctx.beginPath();
+        ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
+        ctx.fillStyle = peg.glow > 0.1 ? '#ffd000' : '#2b314d';
+        ctx.shadowBlur = peg.glow * 15;
+        ctx.shadowColor = '#ffd000';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        peg.glow *= 0.92;
+      });
+
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(loop);
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      initAudio();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      for (let i = 0; i < 3; i++) {
+        particles.push(new Particle(x + (Math.random() * 10 - 5), y));
+      }
+    });
+
+    function clearSynthNodes() {
+      particles = [];
+    }
+
+    window.addEventListener('resize', resizeSynthCanvas);
+    resizeSynthCanvas();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
